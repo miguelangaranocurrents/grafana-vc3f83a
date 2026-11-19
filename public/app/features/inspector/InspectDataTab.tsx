@@ -89,7 +89,11 @@ export const InspectDataTab = memo(function InspectDataTab({
   const transformedData = !data ? [] : shouldJoin && joined?.input === data ? joined.frames : data;
 
   const exportCsv = (dataFrames: DataFrame[]) => {
-    const dataFrame = dataFrames[dataFrameIndex];
+    // Applying panel transformations can collapse the frame list (e.g. joining), while the
+    // selected dataframe index still points at the pre-transformation list. Reuse the same
+    // fallback the preview uses so we never export a non-existent frame.
+    const index = !dataFrames[dataFrameIndex] ? 0 : dataFrameIndex;
+    const dataFrame = dataFrames[index];
 
     downloadDataFrameAsCsv(dataFrame, dataName, {}, transformId, excelCompatibilityMode);
   };

@@ -241,7 +241,9 @@ export const groupToNestedTable: DataTransformerInfo<
             for (const aggregation of aggregations) {
               const aggregationField: Field = {
                 name: `${fieldName} (${aggregation})`,
-                values: valuesByAggregation[aggregation],
+                // the values are only populated while iterating groups — with zero rows
+                // there is nothing to push, so fall back to an empty column
+                values: valuesByAggregation[aggregation] ?? [],
                 type: FieldType.other,
                 config: {},
               };

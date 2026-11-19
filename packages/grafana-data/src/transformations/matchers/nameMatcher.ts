@@ -116,7 +116,13 @@ function fieldNameFallback(fields: Set<string>) {
     };
   } else if (fields.has('Time') || fields.has('time')) {
     fallback = (field: Field, frame: DataFrame) => {
-      return frame.meta?.typeVersion == null && field.type === FieldType.time;
+      if (frame.meta?.typeVersion != null || field.type !== FieldType.time) {
+        return false;
+      }
+      // Matching by type alone is only unambiguous when the frame carries a single time
+      // field. With several of them, a config naming one field (e.g. "time") must not
+      // swallow the other time fields as well.
+      return frame.fields.filter((f) => f.type === FieldType.time).length === 1;
     };
   }
 
